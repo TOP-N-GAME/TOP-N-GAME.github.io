@@ -1,99 +1,300 @@
 <!DOCTYPE html>
-<html>
+<html lang="ru">
 <head>
-    <title>JS Runner</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JS Runner — Apple Style</title>
     <style>
-        body, html {
+        * {
             margin: 0;
             padding: 0;
-            height: 100%;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
         }
+
+        body {
+            background: linear-gradient(135deg, #f9f9fb 0%, #f0f2f5 100%);
+            color: #1d1d1f;
+            height: 100vh;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 15px 0 25px 0;
+        }
+
+        .title {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+            background: linear-gradient(90deg, #2c2c2e, #1d1d1f);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 5px;
+        }
+
+        .subtitle {
+            font-size: 14px;
+            color: #86868b;
+            font-weight: 400;
+        }
+
         .container {
             display: flex;
-            height: 100%;
+            height: calc(100vh - 120px);
+            gap: 20px;
+            max-width: 1800px;
+            margin: 0 auto;
         }
+
         .panel {
-            width: 50%;
-            height: 100%;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-radius: 18px;
+            box-shadow: 
+                0 4px 20px rgba(0, 0, 0, 0.03),
+                0 6px 60px rgba(0, 0, 0, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
+            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
+
+        .panel-header {
+            padding: 18px 24px;
+            background: rgba(242, 242, 247, 0.7);
+            border-bottom: 1px solid rgba(224, 224, 230, 0.5);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 16px;
+            font-weight: 500;
+            color: #2c2c2e;
+        }
+
+        .editor-container {
+            flex: 1;
+            position: relative;
+        }
+
         textarea {
             width: 100%;
             height: 100%;
+            padding: 24px;
             border: none;
-            border-right: 1px solid #ccc;
-            padding: 10px;
+            background: transparent;
             resize: none;
-            font-family: monospace;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #1d1d1f;
+            outline: none;
+            font-family: 'SF Mono', Menlo, monospace;
         }
+
+        textarea::placeholder {
+            color: #aeaeb2;
+        }
+
         iframe {
             width: 100%;
             height: 100%;
             border: none;
+            background: white;
         }
+
         .run-btn {
-            padding: 8px 16px;
-            background: #4CAF50;
+            background: linear-gradient(135deg, #0a84ff 0%, #0066cc 100%);
             color: white;
             border: none;
+            border-radius: 12px;
+            padding: 10px 24px;
+            font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 
+                0 4px 10px rgba(10, 132, 255, 0.25),
+                0 1px 2px rgba(10, 132, 255, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .run-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 
+                0 6px 14px rgba(10, 132, 255, 0.3),
+                0 2px 4px rgba(10, 132, 255, 0.2);
+        }
+
+        .run-btn:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 2px 6px rgba(10, 132, 255, 0.25),
+                0 1px 2px rgba(10, 132, 255, 0.15);
+        }
+
+        .console-output {
+            padding: 20px;
+            background: #1d1d1f;
+            color: #f5f5f7;
+            border-radius: 12px;
+            margin-top: 15px;
+            font-family: 'SF Mono', Menlo, monospace;
+            font-size: 13px;
+            line-height: 1.4;
+            max-height: 120px;
+            overflow-y: auto;
+            display: none;
+        }
+
+        .console-title {
+            color: #aeaeb2;
+            font-size: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .console-visible {
+            display: block;
+        }
+
+        .dot {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+
+        .dot-red { background: #ff453a; }
+        .dot-yellow { background: #ffd60a; }
+        .dot-green { background: #30d158; }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+                height: auto;
+            }
+            .panel {
+                min-height: 300px;
+            }
         }
     </style>
 </head>
 <body>
+    <div class="header">
+        <h1 class="title">JS Runner</h1>
+        <p class="subtitle">Редактор JavaScript с мгновенным выполнением</p>
+    </div>
+
     <div class="container">
         <div class="panel">
-            <textarea id="code" placeholder="Введите JavaScript код">// Пример кода
-document.body.innerHTML = "<h1>Привет, мир!</h1>";
-console.log("Код выполнен!");</textarea>
-            <button class="run-btn" onclick="runCode()">Выполнить</button>
+            <div class="panel-header">
+                <div class="panel-title">Редактор</div>
+                <button class="run-btn" onclick="runCode()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M8 5V19L19 12L8 5Z" fill="white"/>
+                    </svg>
+                    Выполнить
+                </button>
+            </div>
+            <div class="editor-container">
+                <textarea id="code" placeholder="// Введите JavaScript код&#10;// Пример:&#10;document.body.style.background = '#f7f7ff';&#10;document.body.innerHTML = '&lt;h1&gt;Привет, мир!&lt;/h1&gt;';&#10;console.log('Код выполнен!');">document.body.style.background = '#f7f7ff';
+document.body.innerHTML = '<div style=\"text-align: center; padding: 40px;\"><h1 style=\"font-size: 48px; margin-bottom: 20px;\">🚀 Привет, мир!</h1><p style=\"color: #86868b; max-width: 500px; margin: 0 auto;\">Этот код выполняется в реальном времени. Измените скрипт слева и нажмите «Выполнить»</p></div>';
+
+console.log('Скрипт успешно выполнен!');</textarea>
+            </div>
         </div>
+
         <div class="panel">
+            <div class="panel-header">
+                <div class="panel-title">Результат</div>
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+            </div>
             <iframe id="output"></iframe>
+            <div id="console" class="console-output"></div>
         </div>
     </div>
 
     <script>
+        const outputConsole = document.getElementById('console');
+        const originalConsole = window.console;
+        
         function runCode() {
             const code = document.getElementById('code').value;
             const iframe = document.getElementById('output');
             const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
             
-            // Очищаем и пересоздаем документ
+            // Очищаем консоль
+            outputConsole.innerHTML = '<div class="console-title">' +
+                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 7L12 13L19 7" stroke="#aeaeb2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
+                ' Консоль' +
+                '</div>';
+            
+            // Перехватываем консоль
+            iframe.contentWindow.console = new Proxy(originalConsole, {
+                get: function(target, prop) {
+                    if (['log', 'error', 'warn', 'info'].includes(prop)) {
+                        return function(...args) {
+                            target[prop](...args);
+                            const message = args.map(arg => 
+                                typeof arg === 'object' ? JSON.stringify(arg) : arg
+                            ).join(' ');
+                            
+                            const div = document.createElement('div');
+                            div.textContent = `> ${message}`;
+                            
+                            if (prop === 'error') {
+                                div.style.color = '#ff453a';
+                            } else if (prop === 'warn') {
+                                div.style.color = '#ffd60a';
+                            } else if (prop === 'info') {
+                                div.style.color = '#64d2ff';
+                            }
+                            
+                            outputConsole.appendChild(div);
+                            outputConsole.classList.add('console-visible');
+                            outputConsole.scrollTop = outputConsole.scrollHeight;
+                        };
+                    }
+                    return target[prop];
+                }
+            });
+            
+            // Создаем документ в iframe
             iframeDoc.open();
             iframeDoc.write(`
                 <!DOCTYPE html>
                 <html>
                 <head>
-                    <script>
-                        // Перехват консоли для отображения в iframe
-                        const originalConsole = {};
-                        ['log', 'error', 'warn', 'info'].forEach(method => {
-                            originalConsole[method] = console[method];
-                            console[method] = (...args) => {
-                                const output = document.getElementById('console');
-                                output.innerHTML += args.join(' ') + '<br>';
-                                originalConsole[method](...args);
-                            };
-                        });
-                    <\/script>
+                    <meta charset="utf-8">
                     <style>
-                        body { font-family: Arial; padding: 10px; }
-                        #console { 
-                            background: #f0f0f0; 
-                            padding: 10px; 
-                            margin-top: 10px;
-                            border: 1px solid #ddd;
-                            font-family: monospace;
+                        body {
+                            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+                            padding: 24px;
+                            background: white;
+                            color: #1d1d1f;
+                            line-height: 1.5;
+                        }
+                        h1, h2, h3 {
+                            font-weight: 600;
+                            letter-spacing: -0.5px;
                         }
                     </style>
                 </head>
                 <body>
-                    <div id="content"></div>
-                    <div id="console"></div>
                     <script>
                         try {
                             ${code}
@@ -107,7 +308,7 @@ console.log("Код выполнен!");</textarea>
             iframeDoc.close();
         }
 
-        // Запустить код при загрузке
+        // Запускаем код при загрузке
         window.onload = runCode;
     </script>
 </body>
