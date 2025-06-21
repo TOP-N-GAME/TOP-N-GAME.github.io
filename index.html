@@ -1,10 +1,114 @@
 <!DOCTYPE html>
-<html lang="ru">
-    <head>
-        <meta charset="UTF-8">
-        <title>Тест, лол</title>
-    </head>
-    <body>
-        <p>если это отображается то... это ничего не значит</p>
-    </body>
+<html>
+<head>
+    <title>JS Runner</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            display: flex;
+            height: 100%;
+        }
+        .panel {
+            width: 50%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+        textarea {
+            width: 100%;
+            height: 100%;
+            border: none;
+            border-right: 1px solid #ccc;
+            padding: 10px;
+            resize: none;
+            font-family: monospace;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .run-btn {
+            padding: 8px 16px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel">
+            <textarea id="code" placeholder="Введите JavaScript код">// Пример кода
+document.body.innerHTML = "<h1>Привет, мир!</h1>";
+console.log("Код выполнен!");</textarea>
+            <button class="run-btn" onclick="runCode()">Выполнить</button>
+        </div>
+        <div class="panel">
+            <iframe id="output"></iframe>
+        </div>
+    </div>
+
+    <script>
+        function runCode() {
+            const code = document.getElementById('code').value;
+            const iframe = document.getElementById('output');
+            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+            
+            // Очищаем и пересоздаем документ
+            iframeDoc.open();
+            iframeDoc.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <script>
+                        // Перехват консоли для отображения в iframe
+                        const originalConsole = {};
+                        ['log', 'error', 'warn', 'info'].forEach(method => {
+                            originalConsole[method] = console[method];
+                            console[method] = (...args) => {
+                                const output = document.getElementById('console');
+                                output.innerHTML += args.join(' ') + '<br>';
+                                originalConsole[method](...args);
+                            };
+                        });
+                    <\/script>
+                    <style>
+                        body { font-family: Arial; padding: 10px; }
+                        #console { 
+                            background: #f0f0f0; 
+                            padding: 10px; 
+                            margin-top: 10px;
+                            border: 1px solid #ddd;
+                            font-family: monospace;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div id="content"></div>
+                    <div id="console"></div>
+                    <script>
+                        try {
+                            ${code}
+                        } catch(e) {
+                            console.error(e.toString());
+                        }
+                    <\/script>
+                </body>
+                </html>
+            `);
+            iframeDoc.close();
+        }
+
+        // Запустить код при загрузке
+        window.onload = runCode;
+    </script>
+</body>
 </html>
