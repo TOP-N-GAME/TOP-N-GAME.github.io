@@ -1,415 +1,103 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JS Runner</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
-
-        body {
-            background: linear-gradient(135deg, #0f0f11 0%, #000000 100%);
-            color: #f5f5f7;
-            height: 100vh;
-            overflow: hidden;
-            padding: 20px;
-        }
-
-        .header {
-            text-align: center;
-            padding: 15px 0 25px 0;
-        }
-
-        .title {
-            font-size: 32px;
-            font-weight: 700;
-            letter-spacing: -0.8px;
-            background: linear-gradient(90deg, #a2a8d3, #64d2ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
-            text-shadow: 0 0 15px rgba(100, 210, 255, 0.15);
-        }
-
-        .subtitle {
-            font-size: 15px;
-            color: #86868b;
-            font-weight: 400;
-            letter-spacing: 0.3px;
-        }
-
-        .container {
-            display: flex;
-            height: calc(100vh - 120px);
-            gap: 20px;
-            max-width: 1800px;
-            margin: 0 auto;
-        }
-
-        .panel {
-            flex: 1;
-            background: rgba(28, 28, 30, 0.7);
-            backdrop-filter: blur(20px);
-            border-radius: 18px;
-            box-shadow: 
-                0 4px 30px rgba(0, 0, 0, 0.4),
-                0 0 0 1px rgba(84, 84, 88, 0.15);
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            transition: all 0.3s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-
-        .panel:hover {
-            box-shadow: 
-                0 6px 40px rgba(0, 0, 0, 0.5),
-                0 0 0 1px rgba(120, 120, 128, 0.2);
-        }
-
-        .panel-header {
-            padding: 18px 24px;
-            background: rgba(44, 44, 46, 0.7);
-            border-bottom: 1px solid rgba(84, 84, 88, 0.4);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .panel-title {
-            font-size: 16px;
-            font-weight: 500;
-            color: #e5e5ea;
-            letter-spacing: 0.2px;
-        }
-
-        .editor-container {
-            flex: 1;
-            position: relative;
-        }
-
-        textarea {
-            width: 100%;
-            height: 100%;
-            padding: 24px;
-            border: none;
-            background: transparent;
-            resize: none;
-            font-size: 15px;
-            line-height: 1.5;
-            color: #e5e5ea;
-            outline: none;
-            font-family: 'SF Mono', Menlo, monospace;
-        }
-
-        textarea::placeholder {
-            color: #636366;
-        }
-
-        textarea:focus {
-            background: rgba(40, 40, 42, 0.3);
-        }
-
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: #1c1c1e;
-        }
-
-        .run-btn {
-            background: linear-gradient(135deg, #0a84ff 0%, #5e5ce6 100%);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 10px 24px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 
-                0 4px 15px rgba(10, 132, 255, 0.25),
-                0 0 10px rgba(94, 92, 230, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .run-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.5s;
-        }
-
-        .run-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 
-                0 6px 20px rgba(10, 132, 255, 0.4),
-                0 0 15px rgba(94, 92, 230, 0.4),
-                inset 0 1px 0 rgba(255, 255, 255, 0.2);
-        }
-
-        .run-btn:hover::before {
-            left: 100%;
-        }
-
-        .run-btn:active {
-            transform: translateY(0);
-            box-shadow: 
-                0 2px 8px rgba(10, 132, 255, 0.3),
-                0 0 5px rgba(94, 92, 230, 0.3),
-                inset 0 1px 0 rgba(255, 255, 255, 0.1);
-        }
-
-        .console-output {
-            padding: 20px;
-            background: rgba(28, 28, 30, 0.9);
-            color: #f5f5f7;
-            border-radius: 12px;
-            margin: 15px;
-            font-family: 'SF Mono', Menlo, monospace;
-            font-size: 13px;
-            line-height: 1.4;
-            max-height: 120px;
-            overflow-y: auto;
-            border: 1px solid rgba(84, 84, 88, 0.4);
-            display: none;
-        }
-
-        .console-title {
-            color: #8e8e93;
-            font-size: 12px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .console-visible {
-            display: block;
-            animation: fadeIn 0.3s ease-out;
-        }
-
-        .dot {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 8px;
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.1);
-        }
-
-        .dot-red { background: #ff453a; }
-        .dot-yellow { background: #ffd60a; }
-        .dot-green { background: #30d158; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-                height: auto;
-            }
-            .panel {
-                min-height: 300px;
-            }
-        }
-
-        /* Стили для скроллбара */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(40, 40, 42, 0.3);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: rgba(120, 120, 128, 0.5);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: rgba(150, 150, 160, 0.6);
-        }
-    </style>
+<meta charset="UTF-8">
+<title>JS Playground</title>
+<style>
+    body {
+        margin: 0;
+        height: 100vh;
+        display: flex;
+        font-family: sans-serif;
+    }
+    /* Левая панель */
+    #editor {
+        width: 40%;
+        background: #1e1e1e;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        padding: 10px;
+        box-sizing: border-box;
+    }
+    textarea {
+        flex: 1;
+        background: #252526;
+        color: #fff;
+        border: none;
+        resize: none;
+        font-family: monospace;
+        font-size: 14px;
+        padding: 10px;
+    }
+    button {
+        margin-top: 10px;
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+    }
+    /* Правая панель */
+    #right {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    #output {
+        flex: 2;
+        border-bottom: 2px solid #ccc;
+        padding: 10px;
+        overflow: auto;
+        background: #f9f9f9;
+    }
+    #consoleOutput {
+        flex: 1;
+        padding: 10px;
+        overflow: auto;
+        background: #222;
+        color: #0f0;
+        font-family: monospace;
+    }
+</style>
 </head>
 <body>
-    <div class="header">
-        <h1 class="title">JS Runner</h1>
-        <p class="subtitle">Редактор JavaScript</p>
-    </div>
 
-    <div class="container">
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Редактор</div>
-                <button class="run-btn" onclick="runCode()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M8 5V19L19 12L8 5Z" fill="white"/>
-                    </svg>
-                    Выполнить
-                </button>
-            </div>
-            <div class="editor-container">
-                <textarea id="code" placeholder="// Введите JavaScript код&#10;// Пример:&#10;document.body.style.background = '#0f0f11';&#10;document.body.innerHTML = '&lt;h1 style=\"color: #fff\"&gt;Привет, мир!&lt;/h1&gt;';&#10;console.log('Код выполнен!');">// Пример кода
-document.body.style.background = '#0f0f11';
-document.body.style.color = '#f5f5f7';
-document.body.innerHTML = '<div style="text-align: center; padding: 40px; background: rgba(28,28,30,0.5); border-radius: 24px; max-width: 600px; margin: 40px auto; border: 1px solid rgba(84,84,88,0.3);">' +
-    '<h1 style="font-size: 48px; margin-bottom: 20px; background: linear-gradient(90deg, #a2a8d3, #64d2ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">🚀 Привет, мир!</h1>' +
-    '<p style="color: #aeaeb2; max-width: 500px; margin: 0 auto; line-height: 1.6;">Этот код выполняется в реальном времени. Измените скрипт слева и нажмите «Выполнить»</p>' +
-    '<div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 15px; margin-top: 30px;">' +
-        '<div style="background: rgba(40,40,42,0.5); padding: 15px; border-radius: 12px; border: 1px solid rgba(84,84,88,0.3);">' +
-            '<div style="font-size: 24px; margin-bottom: 5px; color: #64d2ff;">1</div>' +
-            '<div style="font-size: 13px; color: #aeaeb2;">Редактируйте код</div>' +
-        '</div>' +
-        '<div style="background: rgba(40,40,42,0.5); padding: 15px; border-radius: 12px; border: 1px solid rgba(84,84,88,0.3);">' +
-            '<div style="font-size: 24px; margin-bottom: 5px; color: #64d2ff;">2</div>' +
-            '<div style="font-size: 13px; color: #aeaeb2;">Нажмите выполнить</div>' +
-        '</div>' +
-        '<div style="background: rgba(40,40,42,0.5); padding: 15px; border-radius: 12px; border: 1px solid rgba(84,84,88,0.3);">' +
-            '<div style="font-size: 24px; margin-bottom: 5px; color: #64d2ff;">3</div>' +
-            '<div style="font-size: 13px; color: #aeaeb2;">Смотрите результат</div>' +
-        '</div>' +
-    '</div>' +
-'</div>';
+<div id="editor">
+    <textarea id="code">// Напиши свой JS код здесь
+console.log("Привет из консоли!");
+document.getElementById("output").innerHTML = "Привет, мир!";
+    </textarea>
+    <button onclick="runCode()">▶ Запустить</button>
+</div>
 
-console.log('Скрипт успешно выполнен! 🎉');</textarea>
-            </div>
-        </div>
+<div id="right">
+    <div id="output">Здесь будет результат выполнения кода</div>
+    <div id="consoleOutput">Здесь будет вывод из console.log</div>
+</div>
 
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">Результат</div>
-                <div>
-                    <div class="dot dot-red"></div>
-                    <div class="dot dot-yellow"></div>
-                    <div class="dot dot-green"></div>
-                </div>
-            </div>
-            <iframe id="output"></iframe>
-            <div id="console" class="console-output"></div>
-        </div>
-    </div>
+<script>
+    // Перехват console.log
+    (function() {
+        const oldLog = console.log;
+        console.log = function(...args) {
+            oldLog.apply(console, args);
+            const consoleDiv = document.getElementById("consoleOutput");
+            consoleDiv.innerHTML += args.join(" ") + "<br>";
+        };
+    })();
 
-    <script>
-        const outputConsole = document.getElementById('console');
-        const originalConsole = window.console;
-        
-        function runCode() {
-            const code = document.getElementById('code').value;
-            const iframe = document.getElementById('output');
-            const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-            
-            // Очищаем консоль
-            outputConsole.innerHTML = '<div class="console-title">' +
-                '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 7L12 13L19 7" stroke="#8e8e93" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' +
-                ' Консоль' +
-                '</div>';
-            
-            // Перехватываем консоль
-            iframe.contentWindow.console = new Proxy(originalConsole, {
-                get: function(target, prop) {
-                    if (['log', 'error', 'warn', 'info'].includes(prop)) {
-                        return function(...args) {
-                            target[prop](...args);
-                            const message = args.map(arg => 
-                                typeof arg === 'object' ? JSON.stringify(arg) : String(arg)
-                            ).join(' ');
-                            
-                            const div = document.createElement('div');
-                            div.textContent = `> ${message}`;
-                            
-                            if (prop === 'error') {
-                                div.style.color = '#ff453a';
-                            } else if (prop === 'warn') {
-                                div.style.color = '#ffd60a';
-                            } else if (prop === 'info') {
-                                div.style.color = '#64d2ff';
-                            } else {
-                                div.style.color = '#e5e5ea';
-                            }
-                            
-                            outputConsole.appendChild(div);
-                            outputConsole.classList.add('console-visible');
-                            outputConsole.scrollTop = outputConsole.scrollHeight;
-                        };
-                    }
-                    return target[prop];
-                }
-            });
-            
-            // Создаем документ в iframe
-            iframeDoc.open();
-            iframeDoc.write(`
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset="utf-8">
-                    <meta name="color-scheme" content="dark">
-                    <style>
-                        body {
-                            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-                            padding: 24px;
-                            background: #1c1c1e;
-                            color: #f5f5f7;
-                            line-height: 1.5;
-                        }
-                        h1, h2, h3 {
-                            font-weight: 700;
-                            letter-spacing: -0.5px;
-                        }
-                        ::-webkit-scrollbar {
-                            width: 8px;
-                        }
-                        ::-webkit-scrollbar-track {
-                            background: rgba(40, 40, 42, 0.3);
-                        }
-                        ::-webkit-scrollbar-thumb {
-                            background: rgba(120, 120, 128, 0.5);
-                            border-radius: 4px;
-                        }
-                    </style>
-                </head>
-                <body>
-                    <script>
-                        try {
-                            ${code}
-                        } catch(e) {
-                            console.error(e.toString());
-                        }
-                    <\/script>
-                </body>
-                </html>
-            `);
-            iframeDoc.close();
+    function runCode() {
+        // Очистка вывода
+        document.getElementById("output").innerHTML = "";
+        document.getElementById("consoleOutput").innerHTML = "";
+
+        const code = document.getElementById("code").value;
+        try {
+            new Function(code)();
+        } catch (err) {
+            console.log("Ошибка:", err);
         }
+    }
+</script>
 
-        // Запускаем код при загрузке
-        window.onload = runCode;
-        
-        // Эффект параллакса для фона
-        document.body.addEventListener('mousemove', (e) => {
-            const x = (window.innerWidth - e.pageX) / 50;
-            const y = (window.innerHeight - e.pageY) / 50;
-            document.body.style.backgroundPosition = `${x}px ${y}px`;
-        });
-    </script>
 </body>
 </html>
